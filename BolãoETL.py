@@ -32,7 +32,7 @@ for index, row in df.iterrows():
             border-radius: 8px; background-color: #ffffff; 
             border: 3px solid #FFE2AA;">
 
-    <img src="https://i.imgur.com/tTAs8NR.jpeg" alt="Banner" style="width: 100%; border-radius: 8px 8px 0 0;">
+    <img src="link_imagem" alt="Banner" style="width: 100%; border-radius: 8px 8px 0 0;">
 
       <h2 style="color: #28B463;">🏆 Bem-vindo ao Bolão!</h2>
 
