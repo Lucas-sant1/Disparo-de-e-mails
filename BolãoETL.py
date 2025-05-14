@@ -34,12 +34,12 @@ for index, row in df.iterrows():
 
     <img src="https://i.imgur.com/tTAs8NR.jpeg" alt="Banner" style="width: 100%; border-radius: 8px 8px 0 0;">
 
-      <h2 style="color: #28B463;">🏆 Bem-vindo ao Bolão VIP!</h2>
+      <h2 style="color: #28B463;">🏆 Bem-vindo ao Bolão!</h2>
 
       <p>Olá <strong>{nome}</strong>,</p>
 
       <p>
-        Estamos muito felizes com sua participação no <strong>nosso Bolão VIP</strong>! ⭐
+        Estamos muito felizes com sua participação no <strong>nosso Bolão</strong>! ⭐
       </p>
 
       <p>
@@ -56,7 +56,7 @@ for index, row in df.iterrows():
       </p>
 
       <p>
-        Quer saber mais sobre o Bolão VIP? Acesse nosso <strong><a href="https://www.exemplo.com.br/" style="color: #28B463;">site oficial</a></strong> com campeonatos, parceiros e planos incríveis!
+        Quer saber mais sobre o Bolão? Acesse nosso <strong><a href="https://www.exemplo.com.br/" style="color: #28B463;">site oficial</a></strong> com campeonatos, parceiros e planos incríveis!
       </p>
 
       <hr style="margin: 20px 0;">
@@ -64,13 +64,13 @@ for index, row in df.iterrows():
       <p><strong>Atendimento:</strong></p>
       <ul style="list-style: none; padding-left: 0;">
         <li>📞 Telefone: (00) 0000-0000</li>
-        <li>📱 WhatsApp: (00) 91234-5678</li>
+        <li>📱 WhatsApp: (00) 0000-0000</li>
         <li>📧 E-mail: <a href="mailto:contato@exemplo.com" style="color: #28B463;">contato@exemplo.com</a></li>
       </ul>
 
       <p style="margin-top: 30px;">
         Grande abraço,<br>
-        <strong>Equipe Bolão VIP</strong>
+        <strong>Equipe Bolão</strong>
       </p>
     </div>
   </body>
