@@ -6,49 +6,58 @@ from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+# Carrega as variáveis de ambiente (.env) com e-mail e senha
 load_dotenv()
 remetente = os.getenv('EMAIL_USER')
 senha = os.getenv('EMAIL_PASSWORD')
 
+# Cria uma sessão para manter os cookies 
 manter_cookies = requests.Session()
 
+# Acessa a página de login e extrai o token de segurança (se existir)
 pagina_login = manter_cookies.get('link_do_login')
 soup = BeautifulSoup(pagina_login.text, 'html.parser')
 token_input = soup.find('input', {'name': '__RequestVerificationToken'})
 token = token_input['value'] if token_input else None
 
+# Dados que serão enviados para fazer o login
 dados_login = {
     'UserName': 'usuario_exemplo',
     'Password': 'senha_exemplo'
 }
 
+# Se existir o token, adiciona ele aos dados de login
 if token:
     dados_login['__RequestVerificationToken'] = token
 
+# Envia os dados para fazer login na plataforma
 res_login = manter_cookies.post(
     'Link_pagina_scraping',
     data=dados_login
 )
 
+# Configura o servidor de e-mail (Gmail, porta 587 com TLS)
 servidor = smtplib.SMTP('smtp.gmail.com', 587)
-servidor.starttls()
-servidor.login(remetente, senha)
+servidor.starttls()  # Inicia conexão segura
+servidor.login(remetente, senha)  # Faz login com os dados do remetente
 
+# Laço para percorrer páginas com os usuários (ex: 1 até 4)
 for pagina in range(1, 5):
-    url = f'Link_pagina_scraping={pagina}'
+    url = f'Link_pagina_scraping={pagina}'  # Monta o link da página
     res_user = manter_cookies.get(url)
     soup_user = BeautifulSoup(res_user.text, 'html.parser')
-    dados_usuario = soup_user.find_all('tr', class_='gridrow')
+    dados_usuario = soup_user.find_all('tr', class_='gridrow')  # Encontra as linhas da tabela
 
     if not dados_usuario:
-        break
+        break  # Se não encontrar dados, para o loop
 
     for linha in dados_usuario:
         colunas = linha.find_all('td')
         if len(colunas) >= 3:
-            nome = colunas[0].text.strip()
-            email = colunas[2].text.strip()
+            nome = colunas[0].text.strip()  # Pega o nome do usuário
+            email = colunas[2].text.strip()  # Pega o e-mail
 
+            # Define o assunto e o corpo do e-mail em HTML
             assunto = 'Convite especial para nosso evento'
             corpo = f"""
             <html>
@@ -80,12 +89,16 @@ for pagina in range(1, 5):
             </html>
             """
 
+            # Monta a estrutura do e-mail com HTML
             mensagem = MIMEMultipart()
             mensagem['From'] = remetente
             mensagem['To'] = email
             mensagem['Subject'] = assunto
             mensagem.attach(MIMEText(corpo, 'html'))
+
+            # Envia o e-mail
             servidor.sendmail(remetente, email, mensagem.as_string())
             print(f'E-mail enviado para {nome} ({email})')
 
+# Encerra a conexão com o servidor de e-mail
 servidor.quit()
