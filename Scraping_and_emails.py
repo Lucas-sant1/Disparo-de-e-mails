@@ -23,7 +23,7 @@ senha = os.getenv('EMAIL_PASSWORD')
 manter_cookies = requests.Session()
 
 # Acessa a página de login e extrai o token
-pagina_login = manter_cookies.get('link_do_login')
+pagina_login = manter_cookies.get('LINK_DA_PAGINA_DE_LOGIN')
 soup = BeautifulSoup(pagina_login.text, 'html.parser')
 token_input = soup.find('input', {'name': '__RequestVerificationToken'})
 token = token_input['value'] if token_input else None
@@ -38,18 +38,124 @@ if token:
 
 # Envia requisição de login
 res_login = manter_cookies.post(
-    'Link_pagina_scraping',
+    'LINK_DO_POST_LOGIN',
     data=dados_login
 )
 
-# Configuração do servidor SMTP
+# Função para gerar corpo do e-mail
+def gerar_corpo_email(nome):
+    return f"""
+<!DOCTYPE html> 
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {{
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }}
+    .outer-container {{
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #323232;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }}
+    .header img {{
+      display: block;
+      width: 100%;
+      height: auto;
+    }}
+    .container {{
+      padding: 30px;
+    }}
+    .title {{
+      color: #1ed760;
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 0;
+    }}
+    .content {{
+      margin-top: 10px;
+      color: #f0f0f0;
+      line-height: 1.6;
+    }}
+    .highlight {{
+      font-weight: bold;
+    }}
+    a {{
+      color: #1ed760 !important;
+      text-decoration: none;
+    }}
+    a:hover {{
+      text-decoration: underline;
+    }}
+    .links a {{
+      margin-right: 15px;
+    }}
+    .footer {{
+      margin-top: 30px;
+      font-size: 14px;
+      color: #cccccc;
+    }}
+    .emoji {{
+      font-size: 20px;
+    }}
+  </style>
+</head>
+<body>
+  <div class="outer-container">
+    <div class="header">
+      <img src="https://i.imgur.com/zTfQBQl.jpeg" alt="Banner Bolão">
+    </div>
+    <div class="container">
+      <div class="title">
+        🏆 Bem-vindo ao Bolão!
+      </div>
+      <div class="content">
+        <p>Olá <strong>{nome}</strong>,</p>
+
+        <p>Estamos muito felizes com sua participação no <span class="highlight">nosso Bolão!</span> ⭐</p>
+
+        <p>Aproveite para conferir nosso <span class="highlight">cardápio de campeonatos disponíveis</span>, crie seu próprio bolão e desafie seus amigos!</p>
+
+        <p>Muitas novidades estão chegando — siga-nos nas redes sociais e fique por dentro de tudo:</p>
+
+        <p class="links">
+          <a href="#">Instagram</a> |
+          <a href="#">Facebook</a>
+        </p>
+
+        <p>Quer saber mais sobre o Bolão? Acesse nosso <a href="#">site oficial</a> com campeonatos, parceiros e planos incríveis!</p>
+      </div>
+
+      <hr style="margin-top: 30px; border: none; border-top: 1px solid #444444;">
+
+      <div class="footer">
+        <p><strong>Atendimento:</strong></p>
+        <p>📞 Telefone: (00) 0000-0000<br>
+           📱 WhatsApp: (00) 0000-0000<br>
+           📧 E-mail: <a href="mailto:contato@exemplo.com">contato@exemplo.com</a></p>
+
+        <p style="margin-top: 20px;">Grande abraço,<br><strong>Equipe Bolão</strong></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+"""
+
+# Configura servidor SMTP
 servidor = smtplib.SMTP('smtp.gmail.com', 587)
 servidor.starttls()
 servidor.login(remetente, senha)
 
-# Loop de scraping e envio de e-mail
-for pagina in range(1, 5):
-    url = f'Link_pagina_scraping={pagina}'
+# Loop para buscar dados e enviar e-mails
+for pagina in range(1, 5):  
+    url = f'LINK_DA_PAGINA_DE_PARTICIPANTES?page={pagina}'
     res_user = manter_cookies.get(url)
     soup_user = BeautifulSoup(res_user.text, 'html.parser')
     dados_usuario = soup_user.find_all('tr', class_='gridrow')
@@ -63,36 +169,8 @@ for pagina in range(1, 5):
             nome = colunas[0].text.strip()
             email = colunas[2].text.strip()
 
-            assunto = 'Convite especial para nosso evento'
-            corpo = f"""
-            <html>
-            <body style="font-family: Arial, sans-serif; color: #333;">
-            <div style="max-width: 600px; margin: auto; padding: 20px; 
-                    border-radius: 8px; background-color: #ffffff; 
-                    border: 3px solid #FFE2AA;">
-            <h2 style="color: #28B463;">🏆 Bem-vindo!</h2>
-            <p>Olá <strong>{nome}</strong>,</p>
-            <p>Estamos muito felizes com sua participação no nosso evento!</p>
-            <p>Confira as novidades e convide seus amigos!</p>
-            <p>Siga-nos nas redes sociais:</p>
-            <p><a href="https://www.instagram.com/exemplo/" style="color: #28B463;">Instagram</a> | 
-            <a href="https://www.facebook.com/exemplo" style="color: #28B463;">Facebook</a></p>
-            <p><strong><a href="https://www.seusite.com/" style="color: #28B463;">site oficial</a></strong></p>
-            <hr style="margin: 20px 0;">
-            <p><strong>Atendimento:</strong></p>
-            <ul style="list-style: none; padding-left: 0;">
-              <li>📞 Telefone: (00) 0000-0000</li>
-              <li>📱 WhatsApp: (00) 0000-0000</li>
-              <li>📧 E-mail: <a href="mailto:contato@seudominio.com" style="color: #28B463;">contato@seudominio.com</a></li>
-            </ul>
-            <p style="margin-top: 30px;">
-              Grande abraço,<br>
-              <strong>Equipe Organizadora</strong>
-            </p>
-            </div>
-            </body>
-            </html>
-            """
+            assunto = 'Convite especial para nosso bolão'
+            corpo = gerar_corpo_email(nome)
 
             mensagem = MIMEMultipart()
             mensagem['From'] = remetente
@@ -108,5 +186,5 @@ for pagina in range(1, 5):
                 print(f'Erro ao enviar para {nome} ({email}): {e}')
                 logging.error(f'Erro ao enviar e-mail para {nome} - {email}: {e}')
 
-# Finaliza o servidor
+# Encerra o servidor
 servidor.quit()
